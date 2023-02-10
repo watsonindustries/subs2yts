@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -11,16 +12,20 @@ import (
 )
 
 func main() {
-	args := os.Args
-	verifyRequiredArgs(args)
-	doProcessing(args)
+	inputFilePath := flag.String("i", "", "input file (e.g. .vtt)")
+	outputFilePath := flag.String("o", *inputFilePath+".txt", "output file (e.g. res.txt)")
+
+	flag.Parse()
+
+	if *inputFilePath == "" {
+		log.Fatal("missing required argument: inputFilePath")
+	}
+
+	doProcessing(*inputFilePath, *outputFilePath)
 }
 
-func doProcessing(args []string) {
+func doProcessing(inputFilePath, outputFilePath string) {
 	start := time.Now()
-
-	inputFilePath := args[1] // TODO: Replace with I/O flag argument parsing instead of positionals
-	outputFilePath := args[2]
 
 	fmt.Println("input file:", inputFilePath)
 	fmt.Println("output file:", outputFilePath)
@@ -66,13 +71,4 @@ func formatTimestamp(duration time.Duration) string {
 	duration -= time.Duration(minutes) * time.Minute
 	seconds := int64(duration.Seconds())
 	return fmt.Sprintf("%02d:%02d:%02d", hours, minutes, seconds)
-}
-
-func verifyRequiredArgs(args []string) {
-	switch len(args) {
-	case 2:
-		log.Fatal("missing required argument: output file")
-	case 1:
-		log.Fatal("missing required arguments: input and output file")
-	}
 }

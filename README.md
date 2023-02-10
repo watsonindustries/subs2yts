@@ -5,7 +5,7 @@
 ## Example
 
 ```bash
-subs2yts resampled-2UtQM5LMopI.wav.vtt out.txt
+subs2yts -i resampled-2UtQM5LMopI.wav.vtt -o out.txt
 ```
 
 Will produce something like:

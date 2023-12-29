@@ -4,8 +4,10 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -16,11 +18,14 @@ const defaultMinTokenCount = 3
 
 func main() {
 	inputFilePath := flag.String("i", "", "input file (e.g. .vtt)")
-	outputFilePath := flag.String("o", *inputFilePath+".txt", "output file (e.g. res.txt)")
-
-	minTokenCount := flag.Int("minTokenCount", defaultMinTokenCount, "minimum number of tokens (words) for a timestamp line to be registered individually")
+	outputFilePath := flag.String("o", "out.txt", "output file (e.g. res.txt)")
 
 	flag.Parse()
+
+	fmt.Println("input file name: ", *inputFilePath)
+	fmt.Println("output file name: ", *outputFilePath)
+
+	minTokenCount := flag.Int("minTokenCount", defaultMinTokenCount, "minimum number of tokens (words) for a timestamp line to be registered individually")
 
 	if *inputFilePath == "" {
 		log.Fatal("missing required argument: inputFilePath")
@@ -39,7 +44,20 @@ func doProcessing(inputFilePath, outputFilePath *string, minTokenCount *int) {
 	check(err)
 	defer data.Close()
 
-	subs, err := astisub.ReadFromWebVTT(data) // FIXME: Check actual file format
+	var subs *astisub.Subtitles
+	var reader func(r io.Reader) (*astisub.Subtitles, error)
+
+	switch filepath.Ext(*inputFilePath) {
+	case ".srt":
+		reader = astisub.ReadFromSRT
+	case ".ssa":
+		reader = astisub.ReadFromSSA
+	case ".vtt":
+		reader = astisub.ReadFromWebVTT
+	}
+
+	subs, err = reader(data)
+
 	check(err)
 
 	outputFile, err := os.Create(*outputFilePath)

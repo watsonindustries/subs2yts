@@ -18,10 +18,14 @@ Will produce something like:
 ...
 ```
 
+Then you can simply copy and paste the lines into the comment section of the target YouTube video.
+
 ## Build
 
 Install Go toolchain and run `go build .`
 
-## Notes
+## Install
 
-- Currently only supports `WebVTT` files as input
+You can install the binary to your `$GOPATH/bin` by running `go install .`
+
+## Notes
